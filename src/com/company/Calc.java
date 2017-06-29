@@ -85,6 +85,9 @@ public class Calc {
 
             }
         }
+        if(numeral.length() != 0){
+            pushDigit(0, numeral.toString());
+        }
         while(!ops.empty()){
             pushDigit(1, String.valueOf(ops.pop()));
         }
@@ -108,15 +111,13 @@ public class Calc {
     public static void main(String[] args) {
 //        String  cmd = "2/(1-5)";
 //        String  cmd = "3+4*2/(1−5)";
-        String  cmd = "3.1+4.1*2.1/(1.1-5.1)^2.1^3.1";
+      //  String  cmd = "3+4*2/(1-5)^2";
+        String  cmd = "(3+4)*2/((1-5)^2/2 )";
         Calc c = new Calc(cmd);
-        System.out.println(c.calc());
-        System.out.println(cmd);
+        System.out.println( c.calc());
     }
 
-    private double calc() {
-        return 0;
-    }
+
 
 
     private int level(char c){
@@ -135,5 +136,50 @@ public class Calc {
                 return -1;
         }
     }
+
+
+
+    public  String calc(){
+        Stack<Digit> tmp = new Stack<>();
+        Digit d = null;
+        while ( (d = data.poll())!= null ){
+            if(d.type == 0){
+                tmp.push(d);
+            }else{
+               double d1 = calc(tmp.pop(), tmp.pop(), d);
+                tmp.push(new Digit(0, String.valueOf(d1)));
+            }
+        }
+        if (tmp.size() != 1) {
+            NumberFormatException e = new NumberFormatException();
+            throw e;
+        }else{
+            return tmp.pop().toString();
+        }
+    }
+
+    private double calc(Digit digit1, Digit digit2, Digit ops) {
+        double f1 = Double.parseDouble(digit2.data);
+        double f2 = Double.parseDouble(digit1.data);
+
+        switch (ops.data.charAt(0)) {
+            case '+':
+                return f1 + f2;
+            case '-':
+                return f1 - f2;
+            case '*':
+                return f1 * f2;
+            case '/':
+                return f1 / f2;
+            case '^':
+                return Math.pow(f1, f2);
+            default:
+                NumberFormatException e = new NumberFormatException();
+                throw e;
+        }
+
+    }
+
+
 
 }
