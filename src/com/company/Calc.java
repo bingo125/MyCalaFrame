@@ -1,59 +1,93 @@
 package com.company;
-
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
-import static sun.misc.PostVMInitHook.run;
 
-/**
- * Created by Administrator on 2017/6/28 0028.
- */
+
 public class Calc {
     private Stack<Character> ops;
-    private Queue<String> data;
+    private Queue<Digit> data;
 
     StringBuffer sb ;
 
 
-    private void pushOps(char ch){
+    private void pushOperator(char  ch){
         if( !ops.empty()){
             if(ch == ')'){
                 while((ch = ops.pop())!= '('){
-                    data.add(String.valueOf(ch));
+                    pushDigit(1, String.valueOf(ch));
                 }
                 return ;
             }
-
-            while(level(ops.peek()) > level(ch)){
-
+            if(ops.peek() == ch && ch == '^'){
+                ops.push(ch);
+                return;
             }
+
+            while(!ops.isEmpty()
+                    &&ops.peek() != '('
+                        &&level(ops.peek()) >= level(ch)){
+                pushDigit(1, String.valueOf(ops.pop()));
+            }
+            ops.push(ch);
         }else{
             ops.push(ch);
         }
     }
 
-    private void run(String cmd) {
-        StringBuffer tmp = new StringBuffer();
-        char[] d = cmd.toCharArray();
-        for (int i = 0; i < d.length; i++) {
-            if(Character.isDigit(d[i])){
-                tmp.append(d[i]);
-            }else if( d[i] == '.'){
-                tmp.append('.');
-            }else{
-                if (tmp.length() > 0) {
-                    double shu =Double.parseDouble(tmp.toString());
-                    data.add(shu);
-                }else if (level(d[i]) == -1){
-                    System.out.println(" error happned " + d[i]);
-                    break;
-                }else{
-                    while(level(d[i]) > level(d))
-                }
-            }
+    public class Digit{
+        private int type;
+        private String data;
+
+        public Digit(int type, String data) {
+            this.type = type;
+            this.data = data;
         }
 
+        @Override
+        public String toString() {
+            return data;
+        }
+    }
+
+    private void pushDigit(int type, String str){
+        Digit d = new Digit(type, str);
+        data.add(d);
+    }
+
+    private String operator  = "-+*/^()";
+
+    private  boolean isDigit(char ch){
+        boolean ret = false;
+        if( Character.isDigit(ch)){
+            ret = true;
+        }
+
+        if(ch == '.'){
+            ret = true;
+        }
+        return ret;
+    }
+
+    private void run(String cmd) {
+        StringBuilder numeral = new StringBuilder();
+        char[] d = cmd.toCharArray();
+        for (int i = 0; i < d.length; i++) {
+            if(isDigit(d[i])){
+                numeral.append(d[i]);
+            }else if(operator.contains(String.valueOf(d[i]))){
+                if(numeral.length() != 0){
+                    pushDigit(0,numeral.toString());
+                    numeral.setLength(0);
+                }
+                pushOperator(d[i]);
+
+            }
+        }
+        while(!ops.empty()){
+            pushDigit(1, String.valueOf(ops.pop()));
+        }
     }
     class  data{
         public int type ;
@@ -72,9 +106,12 @@ public class Calc {
     }
 
     public static void main(String[] args) {
-        String  cmd = "3+4*2/(1−5)^2^3";
+//        String  cmd = "2/(1-5)";
+//        String  cmd = "3+4*2/(1−5)";
+        String  cmd = "3.1+4.1*2.1/(1.1-5.1)^2.1^3.1";
         Calc c = new Calc(cmd);
         System.out.println(c.calc());
+        System.out.println(cmd);
     }
 
     private double calc() {
