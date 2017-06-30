@@ -40,7 +40,7 @@ public class Calc {
         private int type;
         private String data;
 
-        public Digit(int type, String data) {
+        Digit(int type, String data) {
             this.type = type;
             this.data = data;
         }
@@ -56,7 +56,7 @@ public class Calc {
         data.add(d);
     }
 
-    private String operator  = "-+*/^()";
+    private String operator  = "-+*/^()%";
 
     private  boolean isDigit(char ch){
         boolean ret = false;
@@ -127,6 +127,7 @@ public class Calc {
                 return  0;
             case '*':
             case '/':
+            case '%':
                 return  1;
             case '^':
                 return  2;
@@ -173,6 +174,8 @@ public class Calc {
                 return f1 / f2;
             case '^':
                 return Math.pow(f1, f2);
+            case '%':
+                return f1 % f2;
             default:
                 NumberFormatException e = new NumberFormatException();
                 throw e;

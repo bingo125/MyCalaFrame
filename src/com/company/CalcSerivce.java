@@ -7,8 +7,9 @@ import java.math.BigDecimal;
  */
 public class CalcSerivce {
     private boolean isExit = false;
-    private String key_num = "1234567890.+*/-()^3^2";
+    private String key_num = "1234567890.+*/-()^3^2%";
     private String key_ops = "=<==1/xC";
+
 
     public String onCmd(String cmd, String in) {
 
@@ -48,13 +49,7 @@ public class CalcSerivce {
 
                     break;
                 case "=":
-                    Calc c = new Calc(in);
-                    try {
-                        BigDecimal bg = new BigDecimal(c.calc());
-                        sb = new StringBuilder(bg.toPlainString());
-                    } catch (Exception e1) {
-                        sb = new StringBuilder("非法输入");
-                    }
+                    sb = calc(in);
 
                     isExit = true;
                     break;
@@ -64,9 +59,25 @@ public class CalcSerivce {
                     sb.setLength(1);
                     isExit = true;
                     break;
+
+                case "1/x":
+                    sb.insert(0, "1/");
+                    sb = calc(sb.toString());
+                    break;
             }
         }
         return sb.toString();
+    }
+
+    private StringBuilder calc(String in) {
+        StringBuilder sb;Calc c = new Calc(in);
+        try {
+            BigDecimal bg = new BigDecimal(c.calc());
+            sb = new StringBuilder(bg.toPlainString());
+        } catch (Exception e1) {
+            sb = new StringBuilder("非法输入");
+        }
+        return sb;
     }
 
 }
